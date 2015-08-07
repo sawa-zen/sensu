@@ -1,0 +1,43 @@
+{
+  "name": "sensu",
+  "version": "0.0.1",
+  "description": "蛇腹状に折りたたむようにスライドするjQueryプラグインスライダー",
+  "main": "index.js",
+  "dependencies": {
+    "babel": "^5.6.14",
+    "babelify": "^6.1.2",
+    "browserify": "^10.2.4",
+    "lodash": "^3.10.0"
+  },
+  "devDependencies": {
+    "jade": "^1.11.0",
+    "node-sass": "^3.2.0",
+    "watch": "^0.16.0",
+    "watchify": "^3.2.3"
+  },
+  "scripts": {
+    "start": "npm run build && npm run watch",
+    "build:js": "browserify src/js/sensu.js -t babelify --outfile sensu.js",
+    "build:jade": "jade < src/jade/index.jade > demo/index.html",
+    "build:sass": "node-sass src/sass/* --output demo/css",
+    "build": "npm run build:jade && npm run build:sass && npm run build:js",
+    "watch:js": "watch 'npm run build:js' src/js/",
+    "watch:jade": "watch 'npm run build:jade' src/jade/",
+    "watch:sass": "watch 'npm run build:sass' src/sass/",
+    "watch": "npm run watch:jade & npm run watch:sass & npm run watch:js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sawa-zen/sensu.git"
+  },
+  "keywords": [
+    "slider",
+    "jquery"
+  ],
+  "author": "sawa-zen <sawadasuiren@gmail.com> (http://sawa-zen.com/)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sawa-zen/sensu/issues"
+  },
+  "homepage": "https://github.com/sawa-zen/sensu"
+}
