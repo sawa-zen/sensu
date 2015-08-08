@@ -17,7 +17,7 @@
   },
   "scripts": {
     "start": "npm run build && npm run watch",
-    "build:js": "browserify src/js/sensu.js -t babelify --outfile sensu.js",
+    "build:js": "browserify src/js/sensu.js -t babelify --outfile sensu.jquery.js",
     "build:jade": "jade < src/jade/index.jade > demo/index.html --pretty",
     "build:sass": "node-sass src/sass/* --output demo/css",
     "build": "npm run build:jade && npm run build:sass && npm run build:js",

@@ -2,5 +2,5 @@ node_modules/
 npm-debug.log
 demo/index.html
 demo/css/*
-/sensu.js
+/sensu.jquery.js
 !.gitkeep
