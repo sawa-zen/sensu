@@ -1,0 +1,6 @@
+node_modules/
+npm-debug.log
+demo/index.html
+demo/css/*
+/sensu.jquery.js
+!.gitkeep
