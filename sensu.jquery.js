@@ -1,39 +1,74 @@
 (function ($) {
-  $.fn.sensu = function (options) {
 
-    console.info('this: ', this);
+  var pluginName = 'sensu',
+      defaults = {};
 
-    var stage;
+  // コンストラクタ
+  function Sensu(element, options) {
+    this.element = element;
+    this.settings = $.extend({}, defaults, options);
+    this._defaults = defaults;
+    this._name = pluginName;
+    this._stage = null;
+    this.init();
+  }
 
-    // デフォルトオプション
-    var defaults = {
-      text: 'This is basic plugin!!!'
-    };
+  // メソッド
+  Sensu.prototype = {
 
-    // オプションをextend
-    var setting = $.extend(defaults, options);
+    /**
+     * 初期設定
+     */
+    init: function() {
+      var _this = this;
 
-    console.log(setting);
+      // createjsのステージを用意
+      _this._stage = new createjs.Stage('sensu');
 
-    // createjsのステージを用意
-    stage = new createjs.Stage('sensu');
+      // LoadQueueクラス
+      var loadQueue = new createjs.LoadQueue();
+      loadQueue.addEventListener('fileload', handleFileLoadComplete);
 
-    // 画像の描画
-    var bitmap = new createjs.Bitmap(setting.list[0]);
-    bitmap.x = 0;
-    bitmap.y = 0;
-    stage.addChild(bitmap);
+      function handleFileLoadComplete(event) {
+        // 読み込んだファイル
+        console.info(event.result);
+        _this._addImage(event.result);
+      }
 
-    // stageの再描画
-    stage.update();
+      // canvasの描画設定
+      // 30fpsで描画を繰り返す
+      createjs.Ticker.setFPS(30);
+      createjs.Ticker.addEventListener('tick', function () {
+        _this._stage.update();
+      });
 
-    // canvasの描画設定
-    // 30fpsで描画を繰り返す
-    createjs.Ticker.setFPS(30);
-    createjs.Ticker.addEventListener('tick', function () {
-      stage.update();
-    });
+      // 読み込み開始
+      loadQueue.loadManifest(_this.settings.list);
+    },
 
-    return this;
+
+    /**
+     * 画像の追加
+     */
+    _addImage: function(img) {
+      var _this = this;
+
+      // 画像の描画
+      var bitmap = new createjs.Bitmap(img);
+      bitmap.x = 0;
+      bitmap.y = 0;
+      _this._stage.addChild(bitmap);
+    }
+
   };
+
+  // メイン
+  $.fn[pluginName] = function(options) {
+    return this.each(function() {
+      if(!$.data(this, 'plugin_' + pluginName)) {
+        $.data(this, 'plugin_' + pluginName, new Sensu(this, options));
+      }
+    });
+  };
+
 })(jQuery);
