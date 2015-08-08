@@ -9,6 +9,8 @@
     var setting = $.extend(defaults, options);
     console.info(setting);
 
-    return;
+    console.log(this);
+
+    return this;
   };
 })(jQuery);
