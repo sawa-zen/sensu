@@ -1,13 +1,7 @@
 # sensu
 蛇腹状に折りたたむようにスライドするjQueryプラグインスライダー
 
-[Demoページ](http://sensu.sawa-zen.com)
-
-## Description
-
-socket.ioのWebsocket通信と、createjsのcanvasによる描画で、
-適当なオンラインゲームのようなものができないか試してみたものです。
-良かったら参考にしてください。
+[Demoページ](http://sensu.sawa-zen.com/demo)
 
 ## Requirement
 
