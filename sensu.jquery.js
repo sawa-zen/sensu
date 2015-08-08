@@ -10,6 +10,7 @@
     this._defaults = defaults;
     this._name = pluginName;
     this._stage = null;
+    this.currentPage = 0;
     this.init();
   }
 
@@ -52,12 +53,45 @@
      */
     _addImage: function(img) {
       var _this = this;
+      var imgWidth = img.width,
+          imgHeight = img.height,
+          sliceCount = 6,
+          sliceWidth = imgWidth / sliceCount,
+          degToRad = Math.PI / 180;
 
-      // 画像の描画
-      var bitmap = new createjs.Bitmap(img);
-      bitmap.x = 0;
-      bitmap.y = 0;
-      _this._stage.addChild(bitmap);
+      console.info(sliceWidth);
+
+      var container = new createjs.Container();
+
+      for (var i = 0; i < sliceCount; i++) {
+        var slice = new createjs.Bitmap(img);
+        slice.sourceRect = new createjs.Rectangle(sliceWidth * i, 0, sliceWidth, imgHeight);
+        slice.cache(0, 0, sliceWidth, imgHeight);
+        slice.filters = [new createjs.ColorMatrixFilter(new createjs.ColorMatrix())];
+        container.addChild(slice);
+      }
+
+      _this._stage.addChild(container);
+
+      function updateEffect(value) {
+        var l = container.getNumChildren();
+        for (var i = 0; i < l; i++) {
+          var slice = container.getChildAt(i);
+          slice.y = Math.sin(value * degToRad) * -sliceWidth / 2;
+          if (i % 2) {
+            slice.skewY = value;
+          } else {
+            slice.skewY = -value;
+            slice.y -= sliceWidth * Math.sin(slice.skewY * degToRad);
+          }
+          slice.x = sliceWidth * (i - l / 2) * Math.cos(slice.skewY * degToRad);
+          slice.filters[0].matrix.setColor(Math.sin(slice.skewY * degToRad) * -80);
+          slice.updateCache();
+        }
+        _this._stage.update();
+      }
+
+      updateEffect(50);
     }
 
   };
