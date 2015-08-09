@@ -4,6 +4,7 @@
       degToRad = Math.PI / 180,
       defaults = {};
 
+
   /**
    * メインクラス
    */
@@ -24,6 +25,20 @@
     // スライダーを生成
     var slider = new Slider();
     _this._stage.addChild(slider);
+
+    // コントローラ
+    var controller = new Controller();
+    _this._stage.addChild(controller);
+
+    // 戻るボタンクリック
+    controller.on('prevclick', function() {
+      console.info('prev!');
+    });
+
+    // 次へボタン
+    controller.on('nextclick', function() {
+      console.info('next!');
+    });
 
     // canvasの描画設定
     // 30fpsで描画を繰り返す
@@ -115,6 +130,7 @@
 
 
 
+
   /**
    * スライスクラス
    */
@@ -139,7 +155,6 @@
     this.isMoving = false;
     this.cache(0, 0, this.width, this.height);
     this.filters = [new createjs.ColorMatrixFilter(new createjs.ColorMatrix())];
-    this.stand();
   };
 
   // 傾きからy軸の値を計算
@@ -183,6 +198,50 @@
   };
 
   createjs.promote(Slice, 'Bitmap');
+
+
+
+
+  /**
+   * コントローラクラス
+   */
+  function Controller() {
+    this.Container_constructor();
+    this.initialize();
+  }
+
+  // Containerクラスを継承
+  createjs.extend(Controller, createjs.Container);
+
+  // 初期化
+  Controller.prototype.initialize = function() {
+    var _this = this;
+
+    // 戻るボタン
+    var prevButton = new createjs.Shape();
+    prevButton.graphics.beginFill('#F00').drawRect(0, 0, 100, 100);
+    prevButton.y = 100;
+    prevButton.on('click', function() {
+      // 戻るボタンクリックを発火
+      _this.dispatchEvent('prevclick');
+    });
+    this.addChild(prevButton);
+
+    // 次へボタン
+    var nextButton = new createjs.Shape();
+    nextButton.graphics.beginFill('#00F').drawRect(0, 0, 100, 100);
+    nextButton.x = 800;
+    nextButton.y = 100;
+    nextButton.on('click', function() {
+      // 次へボタンクリックを発火
+      _this.dispatchEvent('nextclick');
+    });
+    this.addChild(nextButton);
+
+  };
+
+  createjs.promote(Controller, 'Container');
+
 
 
 
