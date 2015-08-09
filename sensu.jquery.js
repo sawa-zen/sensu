@@ -1,6 +1,7 @@
 (function ($) {
 
   var pluginName = 'sensu',
+      degToRad = Math.PI / 180,
       defaults = {};
 
   /**
@@ -10,9 +11,11 @@
     this.settings = $.extend({}, defaults, options);
     this._defaults = defaults;
     this._stage = null;
-    this.init();
+    this.initialize();
   }
-  Sensu.prototype.init = function() {
+
+  // 初期化
+  Sensu.prototype.initialize = function() {
     var _this = this;
 
     // createjsのステージを用意
@@ -42,6 +45,7 @@
 
 
 
+
   /**
    * スライダークラス
    */
@@ -49,16 +53,29 @@
     this.Container_constructor();
     this.initialize();
   }
+
   // Containerクラスを継承
   createjs.extend(Slider, createjs.Container);
+
   // 初期化
   Slider.prototype.initialize = function() {
   };
+
   // ページ追加
   Slider.prototype.addPage = function(img) {
     this.addChild(new Page(img));
   };
+
+  // 次のページへ
+  Slider.prototype.goNext = function() {
+  };
+
+  // 前のページへ
+  Slider.prototype.goPrev = function() {
+  };
+
   createjs.promote(Slider, 'Container');
+
 
 
 
@@ -67,64 +84,105 @@
    */
   function Page(img) {
     this.Container_constructor();
-    this.x = 415;
     this.width = img.width;
     this.height = img.height;
     this.sliceCount = 10;
     this.sliceWidth = this.width / this.sliceCount;
     this.initialize(img);
   }
+
   // Containerクラスを継承
   createjs.extend(Page, createjs.Container);
+
   // 初期化
   Page.prototype.initialize = function(img) {
-
     // スライス数分画像を分割して生成
-    for (var i = 0; i < this.sliceCount; i++) {
-      var slice = new createjs.Bitmap(img);
-      slice.sourceRect = new createjs.Rectangle(
-        this.sliceWidth * i, 0, this.sliceWidth, this.height
-      );
-      slice.cache(0, 0, this.sliceWidth, this.height);
-      slice.filters = [
-        new createjs.ColorMatrixFilter(new createjs.ColorMatrix())
-      ];
+    for (var index = 0; index < this.sliceCount; index++) {
+      var slice = new Slice(img, this.sliceWidth, index);
       this.addChild(slice);
     }
-
-    this.open();
   };
+
   // 開く
   Page.prototype.open = function() {
-    createjs.Tween.get(this)
-      .to({x: 0, skewY: 90}, 2000, createjs.Ease.getPowInOut(4));
-    //var value = 45;
-    //degToRad = Math.PI / 180;
-    //var l = this.getNumChildren();
-    //for (var i = 0; i < l; i++) {
-    //  var slice = this.getChildAt(i);
-    //  slice.y = Math.sin(value * degToRad) * -this.sliceWidth / 2;
-    //  if (i % 2) {
-    //    slice.skewY = value;
-    //  } else {
-    //    slice.skewY = -value;
-    //    slice.y -= this.sliceWidth * Math.sin(slice.skewY * degToRad);
-    //  }
-    //  slice.x = this.sliceWidth * (i - l / 2) * Math.cos(slice.skewY * degToRad);
-    //  slice.filters[0].matrix.setColor(Math.sin(slice.skewY * degToRad) * -80);
-    //  slice.updateCache();
-    //}
   };
+
   // 閉じる
   Page.prototype.close = function() {
   };
+
   createjs.promote(Page, 'Container');
 
 
 
   /**
-   * コントローラークラス
+   * スライスクラス
    */
+  function Slice(img, width, index) {
+    this.Bitmap_constructor(img);
+    this.x = width * index;
+    this.index = index;
+    this.width = width;
+    this.height = img.height;
+    this.sourceRect = new createjs.Rectangle(
+      width * index, 0, width, img.height
+    );
+    this.isMoving = false;
+    this.initialize();
+  }
+
+  // Bitmapクラスを継承
+  createjs.extend(Slice, createjs.Bitmap);
+
+  // 初期化
+  Slice.prototype.initialize = function() {
+    this.isMoving = false;
+    this.cache(0, 0, this.width, this.height);
+    this.filters = [new createjs.ColorMatrixFilter(new createjs.ColorMatrix())];
+    this.stand();
+  };
+
+  // 傾きからy軸の値を計算
+  Slice.prototype._calYposFromAngle = function(angle) {
+    // y軸の調整と傾き
+    var y = Math.sin(angle * degToRad) * -this.width / 2;
+    return y;
+  };
+
+  // 立てる
+  Slice.prototype.stand = function() {
+    var value = 0;
+    this.on('tick', function() {
+      if(value > 90) {
+        return;
+      }
+
+      // 傾き
+      if (this.index % 2) {
+        this.skewY = value;
+      } else {
+        this.skewY = -value;
+      }
+
+      // y軸の動き
+      this.y = this._calYposFromAngle(this.skewY);
+      // x軸の動き
+      this.x = (this.width * Math.cos(value * degToRad)) * this.index;
+
+      // フィルターの更新
+      this.filters[0].matrix.setColor(Math.sin(this.skewY * degToRad) * -80);
+      this.updateCache();
+
+      // 度数のインクリメント
+      value++;
+    });
+  };
+
+  // 倒す
+  Slice.prototype.layDown = function() {
+  };
+
+  createjs.promote(Slice, 'Bitmap');
 
 
 
