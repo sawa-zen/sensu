@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>sensu demo</title>
+    <meta content="sensu demo" name="description">
+    <!-- CSS-->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.min.css" rel="stylesheet">
+    <link href="./css/demo.css" rel="stylesheet">
+    <!-- JS-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="https://code.createjs.com/createjs-2015.05.21.min.js"></script>
+  </head>
+  <body>
+    <h1>Sensu</h1>
+    <canvas id="sensu" width="950" height="335">Canvasが使えるブラウザで見てね</canvas>
+    <!-- sensu-->
+    <script defer src="../sensu.jquery.js"></script>
+    <!-- demo-->
+    <script type="text/javascript">
+      $(window).load(function(){
+        $('#sensu').sensu({
+          list: [
+            './img/demo_1.png'
+          ]
+        });
+      });
+    </script>
+  </body>
+</html>

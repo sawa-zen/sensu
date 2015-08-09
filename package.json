@@ -1,0 +1,20 @@
+{
+  "name": "sensu",
+  "version": "0.0.1",
+  "description": "蛇腹状に折りたたむようにスライドするjQueryプラグインスライダー",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sawa-zen/sensu.git"
+  },
+  "keywords": [
+    "slider",
+    "jquery"
+  ],
+  "author": "sawa-zen <sawadasuiren@gmail.com> (http://sawa-zen.com/)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sawa-zen/sensu/issues"
+  },
+  "homepage": "https://github.com/sawa-zen/sensu"
+}
