@@ -24,7 +24,7 @@
 
     // canvasの描画設定
     // 30fpsで描画を繰り返す
-    createjs.Ticker.setFPS(30);
+    createjs.Ticker.setFPS(60);
     createjs.Ticker.addEventListener('tick', function () {
       _this._stage.update();
     });
@@ -86,7 +86,9 @@
         this.sliceWidth * i, 0, this.sliceWidth, this.height
       );
       slice.cache(0, 0, this.sliceWidth, this.height);
-      slice.filters = [new createjs.ColorMatrixFilter(new createjs.ColorMatrix())];
+      slice.filters = [
+        new createjs.ColorMatrixFilter(new createjs.ColorMatrix())
+      ];
       this.addChild(slice);
     }
 
@@ -94,22 +96,24 @@
   };
   // 開く
   Page.prototype.open = function() {
-    var value = 45;
-    degToRad = Math.PI / 180;
-    var l = this.getNumChildren();
-    for (var i = 0; i < l; i++) {
-      var slice = this.getChildAt(i);
-      slice.y = Math.sin(value * degToRad) * -this.sliceWidth / 2;
-      if (i % 2) {
-        slice.skewY = value;
-      } else {
-        slice.skewY = -value;
-        slice.y -= this.sliceWidth * Math.sin(slice.skewY * degToRad);
-      }
-      slice.x = this.sliceWidth * (i - l / 2) * Math.cos(slice.skewY * degToRad);
-      slice.filters[0].matrix.setColor(Math.sin(slice.skewY * degToRad) * -80);
-      slice.updateCache();
-    }
+    createjs.Tween.get(this)
+      .to({x: 0, skewY: 90}, 2000, createjs.Ease.getPowInOut(4));
+    //var value = 45;
+    //degToRad = Math.PI / 180;
+    //var l = this.getNumChildren();
+    //for (var i = 0; i < l; i++) {
+    //  var slice = this.getChildAt(i);
+    //  slice.y = Math.sin(value * degToRad) * -this.sliceWidth / 2;
+    //  if (i % 2) {
+    //    slice.skewY = value;
+    //  } else {
+    //    slice.skewY = -value;
+    //    slice.y -= this.sliceWidth * Math.sin(slice.skewY * degToRad);
+    //  }
+    //  slice.x = this.sliceWidth * (i - l / 2) * Math.cos(slice.skewY * degToRad);
+    //  slice.filters[0].matrix.setColor(Math.sin(slice.skewY * degToRad) * -80);
+    //  slice.updateCache();
+    //}
   };
   // 閉じる
   Page.prototype.close = function() {
