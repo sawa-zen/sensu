@@ -56,9 +56,9 @@
     // LoadQueueクラス
     var loadQueue = new createjs.LoadQueue();
     // 一つのファイル毎のcallback
-    loadQueue.addEventListener('fileload', function(event) {
-      // スライダーにページを追加
-      slider.addPage(event.result);
+    loadQueue.addEventListener('complete', function() {
+      // スライダーにページセット
+      slider.setPages(loadQueue.getItems());
     });
     // 読み込み開始
     loadQueue.loadManifest(_this.settings.list);
@@ -72,7 +72,7 @@
    */
   function Slider() {
     this.Container_constructor();
-    this.currentPage = 1;
+    this.currentPage = 0;
     this.pages = [];
     this.isMoving = false;
   }
@@ -81,30 +81,25 @@
   createjs.extend(Slider, createjs.Container);
 
   // ページ追加
-  Slider.prototype.addPage = function(img) {
+  Slider.prototype.setPages = function(list) {
+    list = list || [];
     var _this = this;
-    var page = new Page(img);
-    // ページのアニメーション開始を監視
-    page.on('beforeanimate', function() {
-      _this.isMoving = true;
+    // 重ね順の関係でlistを逆順に
+    list.reverse();
+    // listの数分pageを生成
+    list.forEach(function(item) {
+      var page = new Page(item.result);
+      // ページのアニメーション開始を監視
+      page.on('beforeanimate', function() {
+        _this.isMoving = true;
+      });
+      // ページのアニメーション終了を監視
+      page.on('afteranimate', function() {
+        _this.isMoving = false;
+      });
+      _this.pages.unshift(page);
+      _this.addChild(page);
     });
-    // ページのアニメーション終了を監視
-    page.on('afteranimate', function() {
-      _this.isMoving = false;
-    });
-    _this.pages.push(page);
-    _this.addChild(page);
-  };
-
-  // 次のページへ
-  Slider.prototype.goNext = function() {
-    // アニメーション中であれば処理しない
-    if(this.isMoving) {
-      return;
-    }
-    // アニメーション中にフラグを変更
-    this.isMoving = true;
-    this.pages[this.currentPage].close();
   };
 
   // 前のページへ
@@ -113,9 +108,34 @@
     if(this.isMoving) {
       return;
     }
+
+    // 次のページがなければ処理しない
+    if(!this.pages[this.currentPage-1]) {
+      return;
+    }
+
     // アニメーション中にフラグを変更
     this.isMoving = true;
+    this.currentPage--;
     this.pages[this.currentPage].open();
+  };
+
+  // 次のページへ
+  Slider.prototype.goNext = function() {
+    // アニメーション中であれば処理しない
+    if(this.isMoving) {
+      return;
+    }
+
+    // 次のページがなければ処理しない
+    if(!this.pages[this.currentPage+1]) {
+      return;
+    }
+
+    // アニメーション中にフラグを変更
+    this.isMoving = true;
+    this.pages[this.currentPage].close();
+    this.currentPage++;
   };
 
   createjs.promote(Slider, 'Container');
@@ -128,23 +148,24 @@
    */
   function Page(img) {
     this.Container_constructor();
+    this.img = img;
     this.width = img.width;
     this.height = img.height;
     this.angle = 0;
     this.sliceCount = 10;
     this.sliceWidth = this.width / this.sliceCount;
-    this.initialize(img);
+    this.initialize();
   }
 
   // Containerクラスを継承
   createjs.extend(Page, createjs.Container);
 
   // 初期化
-  Page.prototype.initialize = function(img) {
+  Page.prototype.initialize = function() {
     var _this = this;
     // スライス数分画像を分割して生成
     for (var index = 0; index < this.sliceCount; index++) {
-      var slice = new Slice(img, this.sliceWidth, index);
+      var slice = new Slice(this.img, this.sliceWidth, index);
       _this.addChild(slice);
     }
 
