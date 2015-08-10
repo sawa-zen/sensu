@@ -12,6 +12,7 @@
     this.settings = $.extend({}, defaults, options);
     this._defaults = defaults;
     this._stage = null;
+    this.el = element;
     this.initialize();
   }
 
@@ -24,10 +25,15 @@
 
     // スライダーを生成
     var slider = new Slider();
+    slider.width = this.el.width;
+    slider.height = this.el.height;
     _this._stage.addChild(slider);
 
     // コントローラ
-    var controller = new Controller();
+    var controller = new Controller({
+      width: this.el.width,
+      height: this.el.width
+    });
     _this._stage.addChild(controller);
 
     // 戻るボタンクリック
@@ -205,8 +211,10 @@
   /**
    * コントローラクラス
    */
-  function Controller() {
+  function Controller(params) {
+    params = params || {};
     this.Container_constructor();
+    $.extend(this, params);
     this.initialize();
   }
 
@@ -219,8 +227,8 @@
 
     // 戻るボタン
     var prevButton = new createjs.Shape();
-    prevButton.graphics.beginFill('#F00').drawRect(0, 0, 100, 100);
-    prevButton.y = 100;
+    prevButton.alpha = 0.5;
+    prevButton.graphics.beginFill('#F00').drawRect(0, 0, 100, this.height);
     prevButton.on('click', function() {
       // 戻るボタンクリックを発火
       _this.dispatchEvent('prevclick');
@@ -229,9 +237,9 @@
 
     // 次へボタン
     var nextButton = new createjs.Shape();
-    nextButton.graphics.beginFill('#00F').drawRect(0, 0, 100, 100);
-    nextButton.x = 800;
-    nextButton.y = 100;
+    nextButton.regX = 100;
+    nextButton.alpha = 0.5;
+    nextButton.graphics.beginFill('#00F').drawRect(this.width, 0, 100, this.height);
     nextButton.on('click', function() {
       // 次へボタンクリックを発火
       _this.dispatchEvent('nextclick');
