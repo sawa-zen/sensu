@@ -38,12 +38,12 @@
 
     // 戻るボタンクリック
     controller.on('prevclick', function() {
-      slider.goNext();
+      slider.goPrev();
     });
 
     // 次へボタン
     controller.on('nextclick', function() {
-      slider.goPrev();
+      slider.goNext();
     });
 
     // canvasの描画設定
@@ -72,7 +72,7 @@
    */
   function Slider() {
     this.Container_constructor();
-    this.currentPage = 0;
+    this.currentPage = 1;
     this.pages = [];
     this.isMoving = false;
   }
@@ -98,14 +98,13 @@
 
   // 次のページへ
   Slider.prototype.goNext = function() {
-    console.info('goNext');
     // アニメーション中であれば処理しない
     if(this.isMoving) {
       return;
     }
     // アニメーション中にフラグを変更
     this.isMoving = true;
-    this.pages[1].open();
+    this.pages[this.currentPage].close();
   };
 
   // 前のページへ
@@ -116,7 +115,7 @@
     }
     // アニメーション中にフラグを変更
     this.isMoving = true;
-    this.pages[1].close();
+    this.pages[this.currentPage].open();
   };
 
   createjs.promote(Slider, 'Container');
