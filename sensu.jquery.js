@@ -38,12 +38,12 @@
 
     // 戻るボタンクリック
     controller.on('prevclick', function() {
-      console.info('prev!');
+      slider.goNext();
     });
 
     // 次へボタン
     controller.on('nextclick', function() {
-      console.info('next!');
+      slider.goPrev();
     });
 
     // canvasの描画設定
@@ -72,27 +72,51 @@
    */
   function Slider() {
     this.Container_constructor();
-    this.initialize();
+    this.currentPage = 0;
+    this.pages = [];
+    this.isMoving = false;
   }
 
   // Containerクラスを継承
   createjs.extend(Slider, createjs.Container);
 
-  // 初期化
-  Slider.prototype.initialize = function() {
-  };
-
   // ページ追加
   Slider.prototype.addPage = function(img) {
-    this.addChild(new Page(img));
+    var _this = this;
+    var page = new Page(img);
+    // ページのアニメーション開始を監視
+    page.on('beforeanimate', function() {
+      _this.isMoving = true;
+    });
+    // ページのアニメーション終了を監視
+    page.on('afteranimate', function() {
+      _this.isMoving = false;
+    });
+    _this.pages.push(page);
+    _this.addChild(page);
   };
 
   // 次のページへ
   Slider.prototype.goNext = function() {
+    console.info('goNext');
+    // アニメーション中であれば処理しない
+    if(this.isMoving) {
+      return;
+    }
+    // アニメーション中にフラグを変更
+    this.isMoving = true;
+    this.pages[1].open();
   };
 
   // 前のページへ
   Slider.prototype.goPrev = function() {
+    // アニメーション中であれば処理しない
+    if(this.isMoving) {
+      return;
+    }
+    // アニメーション中にフラグを変更
+    this.isMoving = true;
+    this.pages[1].close();
   };
 
   createjs.promote(Slider, 'Container');
@@ -107,6 +131,7 @@
     this.Container_constructor();
     this.width = img.width;
     this.height = img.height;
+    this.angle = 0;
     this.sliceCount = 10;
     this.sliceWidth = this.width / this.sliceCount;
     this.initialize(img);
@@ -117,19 +142,65 @@
 
   // 初期化
   Page.prototype.initialize = function(img) {
+    var _this = this;
     // スライス数分画像を分割して生成
     for (var index = 0; index < this.sliceCount; index++) {
       var slice = new Slice(img, this.sliceWidth, index);
-      this.addChild(slice);
+      _this.addChild(slice);
     }
+
+    // アニメーション終了を監視
+    _this.on('afteranimate', function() {
+      _this.removeAllEventListeners('tick');
+    });
   };
 
   // 開く
   Page.prototype.open = function() {
+    var _this = this;
+
+    // アニメーション開始イベントを発火
+    _this.dispatchEvent('beforeanimate');
+
+    var handleTick = function() {
+      if(_this.angle < 0) {
+        // アニメーション終了イベントを発火
+        _this.dispatchEvent('afteranimate');
+        return;
+      }
+      // スライス全てを立ち上がらせる
+      _this.children.forEach(function(slice) {
+        slice.updateFromAngle(_this.angle);
+      });
+      // 度数のデクリメント
+      _this.angle--;
+    };
+    // 開くアニメーション用にtickイベント追加
+    _this.on('tick', handleTick);
   };
 
   // 閉じる
   Page.prototype.close = function() {
+    var _this = this;
+
+    // アニメーション開始イベントを発火
+    _this.dispatchEvent('beforeanimate');
+
+    var handleTick = function() {
+      if(_this.angle > 90) {
+        // アニメーション終了イベントを発火
+        _this.dispatchEvent('afteranimate');
+        return;
+      }
+      // スライス全てを立たせる
+      _this.children.forEach(function(slice) {
+        slice.updateFromAngle(_this.angle);
+      });
+      // 度数のインクリメント
+      _this.angle++;
+    };
+    // 閉じるアニメーション用にtickイベント追加
+    _this.on('tick', handleTick);
   };
 
   createjs.promote(Page, 'Container');
@@ -150,57 +221,34 @@
       width * index, 0, width, img.height
     );
     this.isMoving = false;
-    this.initialize();
+    this.cache(0, 0, this.width, this.height);
+    this.filters = [new createjs.ColorMatrixFilter(new createjs.ColorMatrix())];
   }
 
   // Bitmapクラスを継承
   createjs.extend(Slice, createjs.Bitmap);
 
-  // 初期化
-  Slice.prototype.initialize = function() {
-    this.isMoving = false;
-    this.cache(0, 0, this.width, this.height);
-    this.filters = [new createjs.ColorMatrixFilter(new createjs.ColorMatrix())];
+  // 傾きからx軸の値を計算
+  Slice.prototype._calXposFromAngle = function(angle) {
+    return (this.width * Math.cos(angle * degToRad)) * this.index;
   };
 
   // 傾きからy軸の値を計算
   Slice.prototype._calYposFromAngle = function(angle) {
-    // y軸の調整と傾き
-    var y = Math.sin(angle * degToRad) * -this.width / 2;
-    return y;
+    return Math.sin(angle * degToRad) * -this.width / 2;
   };
 
-  // 立てる
-  Slice.prototype.stand = function() {
-    var value = 0;
-    this.on('tick', function() {
-      if(value > 90) {
-        return;
-      }
-
+  // 傾きから状態を更新
+  Slice.prototype.updateFromAngle = function(angle) {
       // 傾き
-      if (this.index % 2) {
-        this.skewY = value;
-      } else {
-        this.skewY = -value;
-      }
-
+      this.skewY = this.index % 2 ? angle : -angle;
       // y軸の動き
       this.y = this._calYposFromAngle(this.skewY);
       // x軸の動き
-      this.x = (this.width * Math.cos(value * degToRad)) * this.index;
-
+      this.x = this._calXposFromAngle(angle);
       // フィルターの更新
-      this.filters[0].matrix.setColor(Math.sin(this.skewY * degToRad) * -80);
+      this.filters[0].matrix.setColor(Math.sin(this.skewY * degToRad) * -25);
       this.updateCache();
-
-      // 度数のインクリメント
-      value++;
-    });
-  };
-
-  // 倒す
-  Slice.prototype.layDown = function() {
   };
 
   createjs.promote(Slice, 'Bitmap');
