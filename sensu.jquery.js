@@ -2,7 +2,10 @@
 
   var pluginName = 'sensu',
       degToRad = Math.PI / 180,
-      defaults = {};
+      defaults = {
+        autoplay: false,
+        autoplaySpeed: 5000
+      };
 
 
   /**
@@ -32,7 +35,7 @@
     // コントローラ
     var controller = new Controller({
       width: this.el.width,
-      height: this.el.width
+      height: this.el.height
     });
     _this._stage.addChild(controller);
 
@@ -52,6 +55,13 @@
     createjs.Ticker.addEventListener('tick', function () {
       _this._stage.update();
     });
+
+    // autoplayが許可されていれば再生する
+    if(_this.settings.autoplay) {
+      setInterval(function() {
+        slider.goNext();
+      }, _this.settings.autoplaySpeed);
+    }
 
     // LoadQueueクラス
     var loadQueue = new createjs.LoadQueue();
