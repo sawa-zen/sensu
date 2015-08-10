@@ -228,7 +228,9 @@
     // 戻るボタン
     var prevButton = new createjs.Shape();
     prevButton.alpha = 0.5;
-    prevButton.graphics.beginFill('#F00').drawRect(0, 0, 100, this.height);
+    prevButton.graphics
+      .beginFill('#F00')
+      .drawRect(0, 0, 100, this.height);
     prevButton.on('click', function() {
       // 戻るボタンクリックを発火
       _this.dispatchEvent('prevclick');
@@ -239,7 +241,9 @@
     var nextButton = new createjs.Shape();
     nextButton.regX = 100;
     nextButton.alpha = 0.5;
-    nextButton.graphics.beginFill('#00F').drawRect(this.width, 0, 100, this.height);
+    nextButton.graphics
+      .beginFill('#00F')
+      .drawRect(this.width, 0, 100, this.height);
     nextButton.on('click', function() {
       // 次へボタンクリックを発火
       _this.dispatchEvent('nextclick');
