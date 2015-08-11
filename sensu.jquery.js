@@ -25,7 +25,7 @@
     var _this = this;
 
     // createjsのステージを用意
-    _this._stage = new createjs.Stage('sensu');
+    _this._stage = new createjs.Stage(this.el.id);
 
     // スライダーを生成
     var slider = new Slider({

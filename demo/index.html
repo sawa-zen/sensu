@@ -13,13 +13,23 @@
   </head>
   <body>
     <h1>Sensu</h1>
-    <canvas id="sensu" width="950" height="335">Canvasが使えるブラウザで見てね</canvas>
+    <canvas id="demo1" width="950" height="335">Canvasが使えるブラウザで見てね</canvas>
+    <canvas id="demo2" width="950" height="335">Canvasが使えるブラウザで見てね</canvas>
     <!-- sensu-->
     <script defer src="../sensu.jquery.js"></script>
     <!-- demo-->
     <script type="text/javascript">
       $(window).load(function(){
-        $('#sensu').sensu({
+        $('#demo1').sensu({
+          list: [
+            './img/demo_1.png',
+            './img/demo_2.png',
+            './img/demo_3.png'
+          ]
+        });
+
+        $('#demo2').sensu({
+          autoplay: true,
           list: [
             './img/demo_1.png',
             './img/demo_2.png',
