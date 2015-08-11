@@ -3,6 +3,7 @@
   var pluginName = 'sensu',
       degToRad = Math.PI / 180,
       defaults = {
+        roop: true,
         autoplay: false,
         autoplaySpeed: 5000
       };
@@ -24,10 +25,12 @@
     var _this = this;
 
     // createjsのステージを用意
-    _this._stage = new createjs.Stage('sensu');
+    _this._stage = new createjs.Stage(this.el.id);
 
     // スライダーを生成
-    var slider = new Slider();
+    var slider = new Slider({
+      roop: _this.settings.roop
+    });
     slider.width = this.el.width;
     slider.height = this.el.height;
     _this._stage.addChild(slider);
@@ -80,72 +83,133 @@
   /**
    * スライダークラス
    */
-  function Slider() {
-    this.Container_constructor();
-    this.currentPage = 0;
-    this.pages = [];
-    this.isMoving = false;
+  function Slider(params) {
+    var _this = this;
+    _this.Container_constructor();
+
+    // 初期化
+    $.extend(_this, params);
+    _this.currentPage = 0;
+    _this.pages = [];
+    _this.isMoving = false;
+
+    // ページング終了を監視
+    _this.on('afteranimate', function() {
+      _this.isMoving = false;
+    });
   }
 
   // Containerクラスを継承
   createjs.extend(Slider, createjs.Container);
 
-  // ページ追加
+  // ページのセット
   Slider.prototype.setPages = function(list) {
     list = list || [];
     var _this = this;
+
     // 重ね順の関係でlistを逆順に
     list.reverse();
+
     // listの数分pageを生成
     list.forEach(function(item) {
-      var page = new Page(item.result);
-      // ページのアニメーション開始を監視
-      page.on('beforeanimate', function() {
-        _this.isMoving = true;
-      });
-      // ページのアニメーション終了を監視
-      page.on('afteranimate', function() {
-        _this.isMoving = false;
-      });
+      var page = _this._createPage(item.result);
       _this.pages.unshift(page);
       _this.addChild(page);
     });
   };
 
+  // ページの生成
+  Slider.prototype._createPage = function(img) {
+    var _this = this;
+    var page = new Page(img);
+
+    // ページのアニメーション開始を監視
+    page.on('beforeanimate', function() {
+      // イベントをバブリング
+      _this.dispatchEvent('beforeanimate');
+    });
+
+    // ページのアニメーション終了を監視
+    page.on('afteranimate', function() {
+      // イベントをバブリング
+      _this.dispatchEvent('afteranimate');
+    });
+
+    return page;
+  };
+
   // 前のページへ
   Slider.prototype.goPrev = function() {
+    var _this = this;
+    var prevPageIndex = _this.currentPage - 1;
+
     // アニメーション中であれば処理しない
-    if(this.isMoving) {
+    if(_this.isMoving) {
       return;
     }
 
-    // 次のページがなければ処理しない
-    if(!this.pages[this.currentPage-1]) {
+    // roopが禁止且つ前のページがなければ処理しない
+    if(!_this.roop && !_this.pages[prevPageIndex]) {
       return;
     }
 
     // アニメーション中にフラグを変更
-    this.isMoving = true;
-    this.currentPage--;
-    this.pages[this.currentPage].open();
+    _this.isMoving = true;
+
+    // 先頭ページだった場合は最後のスライドを出す
+    if(prevPageIndex < 0) {
+      prevPageIndex = _this.getNumChildren() - 1;
+    }
+
+    // 前のページを予め閉じておく
+    _this.pages[prevPageIndex].nonAnimClose();
+
+    // 重なりを調節
+    _this.setChildIndex(_this.pages[prevPageIndex], _this.getNumChildren() - 1);
+    _this.setChildIndex(_this.pages[_this.currentPage], _this.getNumChildren() - 2);
+
+    // 前のページを開く
+    _this.pages[prevPageIndex].open();
+
+    // カレントページを更新
+    _this.currentPage = prevPageIndex;
   };
 
   // 次のページへ
   Slider.prototype.goNext = function() {
+    var _this = this;
+    var nextPageIndex = _this.currentPage + 1;
+
     // アニメーション中であれば処理しない
-    if(this.isMoving) {
+    if(_this.isMoving) {
       return;
     }
 
-    // 次のページがなければ処理しない
-    if(!this.pages[this.currentPage+1]) {
+    // roopが禁止且つ次のページがなければ処理しない
+    if(!_this.roop && !_this.pages[nextPageIndex]) {
       return;
     }
 
     // アニメーション中にフラグを変更
-    this.isMoving = true;
-    this.pages[this.currentPage].close();
-    this.currentPage++;
+    _this.isMoving = true;
+
+    // 最後ページだった場合は最初のページを出す
+    if(_this.getNumChildren() - 1 < nextPageIndex) {
+      nextPageIndex = 0;
+    }
+
+    // 次のページを予め開いておく
+    _this.pages[nextPageIndex].nonAnimOpen();
+
+    // 重なりを調節
+    _this.setChildIndex(_this.pages[_this.currentPage], _this.getNumChildren() - 1);
+    _this.setChildIndex(_this.pages[nextPageIndex], _this.getNumChildren() - 2);
+
+    // カレントページを閉じる
+    _this.pages[_this.currentPage].close();
+
+    // カレントページの更新
+    _this.currentPage = nextPageIndex;
   };
 
   createjs.promote(Slider, 'Container');
@@ -157,31 +221,49 @@
    * ページクラス
    */
   function Page(img) {
-    this.Container_constructor();
-    this.img = img;
-    this.width = img.width;
-    this.height = img.height;
-    this.angle = 0;
-    this.sliceCount = 10;
-    this.sliceWidth = this.width / this.sliceCount;
-    this.initialize();
+    var _this = this;
+
+    _this.Container_constructor();
+
+    // 初期化
+    _this.img = img;
+    _this.width = img.width;
+    _this.height = img.height;
+    _this.angle = 0;
+    _this.sliceCount = 10;
+    _this.sliceWidth = _this.width / _this.sliceCount;
+
+    // スライスをセット
+    _this._setSlices();
+
+    // アニメーション終了を監視
+    _this.on('afteranimate', function() {
+      // tickに登録されている開閉アニメーションを削除
+      _this.removeAllEventListeners('tick');
+    });
   }
 
   // Containerクラスを継承
   createjs.extend(Page, createjs.Container);
 
   // 初期化
-  Page.prototype.initialize = function() {
+  Page.prototype._setSlices = function() {
     var _this = this;
     // スライス数分画像を分割して生成
-    for (var index = 0; index < this.sliceCount; index++) {
-      var slice = new Slice(this.img, this.sliceWidth, index);
+    for (var index = 0; index < _this.sliceCount; index++) {
+      var slice = new Slice(_this.img, _this.sliceWidth, index);
       _this.addChild(slice);
     }
+  };
 
-    // アニメーション終了を監視
-    _this.on('afteranimate', function() {
-      _this.removeAllEventListeners('tick');
+  // アニメーション無しで開く
+  Page.prototype.nonAnimOpen = function() {
+    var _this = this;
+
+    // スライス全てを立ち上がらせる
+    _this.angle = 0;
+    _this.children.forEach(function(slice) {
+      slice.updateFromAngle(_this.angle);
     });
   };
 
@@ -205,8 +287,19 @@
       // 度数のデクリメント
       _this.angle--;
     };
+
     // 開くアニメーション用にtickイベント追加
     _this.on('tick', handleTick);
+  };
+
+  // アニメーション無しで閉じる
+  Page.prototype.nonAnimClose = function() {
+    var _this = this;
+    // スライス全てを閉じる
+    _this.angle = 90;
+    _this.children.forEach(function(slice) {
+      slice.updateFromAngle(_this.angle);
+    });
   };
 
   // 閉じる
@@ -229,6 +322,7 @@
       // 度数のインクリメント
       _this.angle++;
     };
+
     // 閉じるアニメーション用にtickイベント追加
     _this.on('tick', handleTick);
   };
@@ -270,15 +364,15 @@
 
   // 傾きから状態を更新
   Slice.prototype.updateFromAngle = function(angle) {
-      // 傾き
-      this.skewY = this.index % 2 ? angle : -angle;
-      // y軸の動き
-      this.y = this._calYposFromAngle(this.skewY);
-      // x軸の動き
-      this.x = this._calXposFromAngle(angle);
-      // フィルターの更新
-      this.filters[0].matrix.setColor(Math.sin(this.skewY * degToRad) * -25);
-      this.updateCache();
+    // 傾き
+    this.skewY = this.index % 2 ? angle : -angle;
+    // y軸の動き
+    this.y = this._calYposFromAngle(this.skewY);
+    // x軸の動き
+    this.x = this._calXposFromAngle(angle);
+    // フィルターの更新
+    this.filters[0].matrix.setColor(Math.sin(this.skewY * degToRad) * -25);
+    this.updateCache();
   };
 
   createjs.promote(Slice, 'Bitmap');
@@ -293,14 +387,14 @@
     params = params || {};
     this.Container_constructor();
     $.extend(this, params);
-    this.initialize();
+    this._setButtons();
   }
 
   // Containerクラスを継承
   createjs.extend(Controller, createjs.Container);
 
-  // 初期化
-  Controller.prototype.initialize = function() {
+  // ボタンの生成
+  Controller.prototype._setButtons = function() {
     var _this = this;
 
     // 戻るボタン
@@ -327,7 +421,6 @@
       _this.dispatchEvent('nextclick');
     });
     this.addChild(nextButton);
-
   };
 
   createjs.promote(Controller, 'Container');
