@@ -28,7 +28,9 @@
     _this._stage = new createjs.Stage('sensu');
 
     // スライダーを生成
-    var slider = new Slider();
+    var slider = new Slider({
+      roop: _this.settings.roop
+    });
     slider.width = this.el.width;
     slider.height = this.el.height;
     _this._stage.addChild(slider);
@@ -81,11 +83,12 @@
   /**
    * スライダークラス
    */
-  function Slider() {
+  function Slider(params) {
     var _this = this;
     _this.Container_constructor();
 
     // 初期化
+    $.extend(_this, params);
     _this.currentPage = 0;
     _this.pages = [];
     _this.isMoving = false;
@@ -145,10 +148,10 @@
       return;
     }
 
-    //// 前のページがなければ処理しない
-    //if(!_this.pages[_this.currentPage-1]) {
-    //  return;
-    //}
+    // roopが禁止且つ前のページがなければ処理しない
+    if(!_this.roop && !_this.pages[prevPageIndex]) {
+      return;
+    }
 
     // アニメーション中にフラグを変更
     _this.isMoving = true;
@@ -182,10 +185,10 @@
       return;
     }
 
-    //// 次のページがなければ処理しない
-    //if(!this.pages[this.currentPage+1]) {
-    //  return;
-    //}
+    // roopが禁止且つ次のページがなければ処理しない
+    if(!_this.roop && !_this.pages[nextPageIndex]) {
+      return;
+    }
 
     // アニメーション中にフラグを変更
     _this.isMoving = true;
@@ -256,6 +259,7 @@
   // アニメーション無しで開く
   Page.prototype.nonAnimOpen = function() {
     var _this = this;
+
     // スライス全てを立ち上がらせる
     _this.angle = 0;
     _this.children.forEach(function(slice) {
@@ -283,6 +287,7 @@
       // 度数のデクリメント
       _this.angle--;
     };
+
     // 開くアニメーション用にtickイベント追加
     _this.on('tick', handleTick);
   };
@@ -317,6 +322,7 @@
       // 度数のインクリメント
       _this.angle++;
     };
+
     // 閉じるアニメーション用にtickイベント追加
     _this.on('tick', handleTick);
   };
