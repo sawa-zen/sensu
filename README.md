@@ -37,8 +37,9 @@
 ## Settings
 Option | Type | Default | Description
 ------ | ---- | ------- | -----------
-autoplay | boolean | false | Enables auto play of slides
-autoplaySpeed | int  | 3000 | Auto play change interval
+roop | boolean | true | ループさせるかどうか
+autoplay | boolean | false | 自動ページングさせるかどうか
+autoplaySpeed | int  | 3000 | 自動ページングさせる時間
 
 
 ## Author

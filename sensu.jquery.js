@@ -3,6 +3,7 @@
   var pluginName = 'sensu',
       degToRad = Math.PI / 180,
       defaults = {
+        roop: true,
         autoplay: false,
         autoplaySpeed: 5000
       };
@@ -81,35 +82,69 @@
    * スライダークラス
    */
   function Slider() {
-    this.Container_constructor();
-    this.currentPage = 0;
-    this.pages = [];
-    this.isMoving = false;
+    var _this = this;
+    _this.Container_constructor();
+
+    // 初期化
+    _this.currentPage = 0;
+    _this.pages = [];
+    _this.isMoving = false;
+
+    // ページング開始を監視
+    _this.on('beforeanimate', function() {
+      console.info('beforeanimate');
+      _this.isMoving = true;
+      _this.setChildIndex(_this.pages[_this.currentPage], _this.getNumChildren() - 1);
+    });
+
+    // ページング終了を監視
+    _this.on('afteranimate', function() {
+      console.info('afteranimate');
+      _this.isMoving = false;
+    });
   }
 
   // Containerクラスを継承
   createjs.extend(Slider, createjs.Container);
 
-  // ページ追加
+  // ページのセット
   Slider.prototype.setPages = function(list) {
     list = list || [];
     var _this = this;
+
     // 重ね順の関係でlistを逆順に
     list.reverse();
+
     // listの数分pageを生成
     list.forEach(function(item) {
-      var page = new Page(item.result);
-      // ページのアニメーション開始を監視
-      page.on('beforeanimate', function() {
-        _this.isMoving = true;
-      });
-      // ページのアニメーション終了を監視
-      page.on('afteranimate', function() {
-        _this.isMoving = false;
-      });
+      var page = _this._createPage(item.result);
       _this.pages.unshift(page);
       _this.addChild(page);
     });
+  };
+
+  // ページの生成
+  Slider.prototype._createPage = function(img) {
+    var _this = this;
+    var page = new Page(img);
+
+    // ページのアニメーション開始を監視
+    page.on('beforeanimate', function(event) {
+      // イベントをバブリング
+      _this.dispatchEvent('beforeanimate', {
+        type: event.type === 'open' ? 'prev' : 'next'
+      });
+    });
+
+    // ページのアニメーション終了を監視
+    page.on('afteranimate', function(event) {
+      // イベントをバブリング
+      _this.dispatchEvent('afteranimate', {
+        type: event.type === 'open' ? 'prev' : 'next'
+      });
+    });
+
+    return page;
   };
 
   // 前のページへ
@@ -119,10 +154,10 @@
       return;
     }
 
-    // 次のページがなければ処理しない
-    if(!this.pages[this.currentPage-1]) {
-      return;
-    }
+    //// 前のページがなければ処理しない
+    //if(!this.pages[this.currentPage-1]) {
+    //  return;
+    //}
 
     // アニメーション中にフラグを変更
     this.isMoving = true;
@@ -137,10 +172,10 @@
       return;
     }
 
-    // 次のページがなければ処理しない
-    if(!this.pages[this.currentPage+1]) {
-      return;
-    }
+    //// 次のページがなければ処理しない
+    //if(!this.pages[this.currentPage+1]) {
+    //  return;
+    //}
 
     // アニメーション中にフラグを変更
     this.isMoving = true;
@@ -157,32 +192,39 @@
    * ページクラス
    */
   function Page(img) {
-    this.Container_constructor();
-    this.img = img;
-    this.width = img.width;
-    this.height = img.height;
-    this.angle = 0;
-    this.sliceCount = 10;
-    this.sliceWidth = this.width / this.sliceCount;
-    this.initialize();
+    var _this = this;
+
+    _this.Container_constructor();
+
+    // 初期化
+    _this.img = img;
+    _this.width = img.width;
+    _this.height = img.height;
+    _this.angle = 0;
+    _this.sliceCount = 10;
+    _this.sliceWidth = _this.width / _this.sliceCount;
+
+    // スライスをセット
+    _this._setSlices();
+
+    // アニメーション終了を監視
+    _this.on('afteranimate', function() {
+      // tickに登録されている開閉アニメーションを削除
+      _this.removeAllEventListeners('tick');
+    });
   }
 
   // Containerクラスを継承
   createjs.extend(Page, createjs.Container);
 
   // 初期化
-  Page.prototype.initialize = function() {
+  Page.prototype._setSlices = function() {
     var _this = this;
     // スライス数分画像を分割して生成
-    for (var index = 0; index < this.sliceCount; index++) {
-      var slice = new Slice(this.img, this.sliceWidth, index);
+    for (var index = 0; index < _this.sliceCount; index++) {
+      var slice = new Slice(_this.img, _this.sliceWidth, index);
       _this.addChild(slice);
     }
-
-    // アニメーション終了を監視
-    _this.on('afteranimate', function() {
-      _this.removeAllEventListeners('tick');
-    });
   };
 
   // 開く
@@ -190,12 +232,12 @@
     var _this = this;
 
     // アニメーション開始イベントを発火
-    _this.dispatchEvent('beforeanimate');
+    _this.dispatchEvent('beforeanimate', {type: 'open'});
 
     var handleTick = function() {
       if(_this.angle < 0) {
         // アニメーション終了イベントを発火
-        _this.dispatchEvent('afteranimate');
+        _this.dispatchEvent('afteranimate', {type: 'open'});
         return;
       }
       // スライス全てを立ち上がらせる
@@ -214,12 +256,12 @@
     var _this = this;
 
     // アニメーション開始イベントを発火
-    _this.dispatchEvent('beforeanimate');
+    _this.dispatchEvent('beforeanimate', {type: 'close'});
 
     var handleTick = function() {
       if(_this.angle > 90) {
         // アニメーション終了イベントを発火
-        _this.dispatchEvent('afteranimate');
+        _this.dispatchEvent('afteranimate', {type: 'close'});
         return;
       }
       // スライス全てを立たせる
@@ -270,15 +312,15 @@
 
   // 傾きから状態を更新
   Slice.prototype.updateFromAngle = function(angle) {
-      // 傾き
-      this.skewY = this.index % 2 ? angle : -angle;
-      // y軸の動き
-      this.y = this._calYposFromAngle(this.skewY);
-      // x軸の動き
-      this.x = this._calXposFromAngle(angle);
-      // フィルターの更新
-      this.filters[0].matrix.setColor(Math.sin(this.skewY * degToRad) * -25);
-      this.updateCache();
+    // 傾き
+    this.skewY = this.index % 2 ? angle : -angle;
+    // y軸の動き
+    this.y = this._calYposFromAngle(this.skewY);
+    // x軸の動き
+    this.x = this._calXposFromAngle(angle);
+    // フィルターの更新
+    this.filters[0].matrix.setColor(Math.sin(this.skewY * degToRad) * -25);
+    this.updateCache();
   };
 
   createjs.promote(Slice, 'Bitmap');
@@ -293,14 +335,14 @@
     params = params || {};
     this.Container_constructor();
     $.extend(this, params);
-    this.initialize();
+    this._setButtons();
   }
 
   // Containerクラスを継承
   createjs.extend(Controller, createjs.Container);
 
-  // 初期化
-  Controller.prototype.initialize = function() {
+  // ボタンの生成
+  Controller.prototype._setButtons = function() {
     var _this = this;
 
     // 戻るボタン
@@ -327,7 +369,6 @@
       _this.dispatchEvent('nextclick');
     });
     this.addChild(nextButton);
-
   };
 
   createjs.promote(Controller, 'Container');
