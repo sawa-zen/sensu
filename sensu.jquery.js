@@ -90,16 +90,8 @@
     _this.pages = [];
     _this.isMoving = false;
 
-    // ページング開始を監視
-    _this.on('beforeanimate', function() {
-      console.info('beforeanimate');
-      _this.isMoving = true;
-      _this.setChildIndex(_this.pages[_this.currentPage], _this.getNumChildren() - 1);
-    });
-
     // ページング終了を監視
     _this.on('afteranimate', function() {
-      console.info('afteranimate');
       _this.isMoving = false;
     });
   }
@@ -129,19 +121,15 @@
     var page = new Page(img);
 
     // ページのアニメーション開始を監視
-    page.on('beforeanimate', function(event) {
+    page.on('beforeanimate', function() {
       // イベントをバブリング
-      _this.dispatchEvent('beforeanimate', {
-        type: event.type === 'open' ? 'prev' : 'next'
-      });
+      _this.dispatchEvent('beforeanimate');
     });
 
     // ページのアニメーション終了を監視
-    page.on('afteranimate', function(event) {
+    page.on('afteranimate', function() {
       // イベントをバブリング
-      _this.dispatchEvent('afteranimate', {
-        type: event.type === 'open' ? 'prev' : 'next'
-      });
+      _this.dispatchEvent('afteranimate');
     });
 
     return page;
@@ -149,26 +137,48 @@
 
   // 前のページへ
   Slider.prototype.goPrev = function() {
+    var _this = this;
+    var prevPageIndex = _this.currentPage - 1;
+
     // アニメーション中であれば処理しない
-    if(this.isMoving) {
+    if(_this.isMoving) {
       return;
     }
 
     //// 前のページがなければ処理しない
-    //if(!this.pages[this.currentPage-1]) {
+    //if(!_this.pages[_this.currentPage-1]) {
     //  return;
     //}
 
     // アニメーション中にフラグを変更
-    this.isMoving = true;
-    this.currentPage--;
-    this.pages[this.currentPage].open();
+    _this.isMoving = true;
+
+    // 先頭ページだった場合は最後のスライドを出す
+    if(prevPageIndex < 0) {
+      prevPageIndex = _this.getNumChildren() - 1;
+    }
+
+    // 前のページを予め閉じておく
+    _this.pages[prevPageIndex].nonAnimClose();
+
+    // 重なりを調節
+    _this.setChildIndex(_this.pages[prevPageIndex], _this.getNumChildren() - 1);
+    _this.setChildIndex(_this.pages[_this.currentPage], _this.getNumChildren() - 2);
+
+    // 前のページを開く
+    _this.pages[prevPageIndex].open();
+
+    // カレントページを更新
+    _this.currentPage = prevPageIndex;
   };
 
   // 次のページへ
   Slider.prototype.goNext = function() {
+    var _this = this;
+    var nextPageIndex = _this.currentPage + 1;
+
     // アニメーション中であれば処理しない
-    if(this.isMoving) {
+    if(_this.isMoving) {
       return;
     }
 
@@ -178,9 +188,25 @@
     //}
 
     // アニメーション中にフラグを変更
-    this.isMoving = true;
-    this.pages[this.currentPage].close();
-    this.currentPage++;
+    _this.isMoving = true;
+
+    // 最後ページだった場合は最初のページを出す
+    if(_this.getNumChildren() - 1 < nextPageIndex) {
+      nextPageIndex = 0;
+    }
+
+    // 次のページを予め開いておく
+    _this.pages[nextPageIndex].nonAnimOpen();
+
+    // 重なりを調節
+    _this.setChildIndex(_this.pages[_this.currentPage], _this.getNumChildren() - 1);
+    _this.setChildIndex(_this.pages[nextPageIndex], _this.getNumChildren() - 2);
+
+    // カレントページを閉じる
+    _this.pages[_this.currentPage].close();
+
+    // カレントページの更新
+    _this.currentPage = nextPageIndex;
   };
 
   createjs.promote(Slider, 'Container');
@@ -227,17 +253,27 @@
     }
   };
 
+  // アニメーション無しで開く
+  Page.prototype.nonAnimOpen = function() {
+    var _this = this;
+    // スライス全てを立ち上がらせる
+    _this.angle = 0;
+    _this.children.forEach(function(slice) {
+      slice.updateFromAngle(_this.angle);
+    });
+  };
+
   // 開く
   Page.prototype.open = function() {
     var _this = this;
 
     // アニメーション開始イベントを発火
-    _this.dispatchEvent('beforeanimate', {type: 'open'});
+    _this.dispatchEvent('beforeanimate');
 
     var handleTick = function() {
       if(_this.angle < 0) {
         // アニメーション終了イベントを発火
-        _this.dispatchEvent('afteranimate', {type: 'open'});
+        _this.dispatchEvent('afteranimate');
         return;
       }
       // スライス全てを立ち上がらせる
@@ -251,17 +287,27 @@
     _this.on('tick', handleTick);
   };
 
+  // アニメーション無しで閉じる
+  Page.prototype.nonAnimClose = function() {
+    var _this = this;
+    // スライス全てを閉じる
+    _this.angle = 90;
+    _this.children.forEach(function(slice) {
+      slice.updateFromAngle(_this.angle);
+    });
+  };
+
   // 閉じる
   Page.prototype.close = function() {
     var _this = this;
 
     // アニメーション開始イベントを発火
-    _this.dispatchEvent('beforeanimate', {type: 'close'});
+    _this.dispatchEvent('beforeanimate');
 
     var handleTick = function() {
       if(_this.angle > 90) {
         // アニメーション終了イベントを発火
-        _this.dispatchEvent('afteranimate', {type: 'close'});
+        _this.dispatchEvent('afteranimate');
         return;
       }
       // スライス全てを立たせる
