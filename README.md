@@ -29,7 +29,13 @@
   ```html
   <script type="text/javascript">
     $(window).onload(function() {
-      $('#my-canvas').sensu();
+      $('#my-canvas').sensu({
+        list: [
+          {src: './img/demo1.png', url: 'http://google.com'},
+          {src: './img/demo2.png', url: 'http://google.com'},
+          {src: './img/demo3.png'}
+        ]
+      });
     });
   </script>
   ```
@@ -37,6 +43,7 @@
 ## Settings
 Option | Type | Default | Description
 ------ | ---- | ------- | -----------
+list | array | [] | 画像のリスト
 roop | boolean | true | ループさせるかどうか
 autoplay | boolean | false | 自動ページングさせるかどうか
 autoplaySpeed | int  | 3000 | 自動ページングさせる時間
