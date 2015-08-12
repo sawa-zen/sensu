@@ -84,7 +84,6 @@
     // 一つのファイル毎のcallback
     loadQueue.addEventListener('complete', function() {
       // スライダーにページセット
-      console.info(loadQueue.getItems());
       slider.setPages(loadQueue.getItems());
     });
     // 読み込み開始
