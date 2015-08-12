@@ -27,6 +27,7 @@
     // createjsのステージを用意
     _this._stage = new createjs.Stage(this.el.id);
 
+
     // スライダーを生成
     var slider = new Slider({
       roop: _this.settings.roop
@@ -34,6 +35,23 @@
     slider.width = this.el.width;
     slider.height = this.el.height;
     _this._stage.addChild(slider);
+
+    // クリックされたらページ紐付いているurlを開く
+    slider.on('click', function() {
+      var url = slider.getCurrentPage().url;
+      if(!url) {
+        return;
+      }
+      window.open(slider.getCurrentPage().url);
+    });
+
+    // autoplayが許可されていれば再生する
+    if(_this.settings.autoplay) {
+      setInterval(function() {
+        slider.goNext();
+      }, _this.settings.autoplaySpeed);
+    }
+
 
     // コントローラ
     var controller = new Controller({
@@ -52,6 +70,7 @@
       slider.goNext();
     });
 
+
     // canvasの描画設定
     // 30fpsで描画を繰り返す
     createjs.Ticker.setFPS(60);
@@ -59,18 +78,13 @@
       _this._stage.update();
     });
 
-    // autoplayが許可されていれば再生する
-    if(_this.settings.autoplay) {
-      setInterval(function() {
-        slider.goNext();
-      }, _this.settings.autoplaySpeed);
-    }
 
     // LoadQueueクラス
     var loadQueue = new createjs.LoadQueue();
     // 一つのファイル毎のcallback
     loadQueue.addEventListener('complete', function() {
       // スライダーにページセット
+      console.info(loadQueue.getItems());
       slider.setPages(loadQueue.getItems());
     });
     // 読み込み開始
@@ -102,6 +116,11 @@
   // Containerクラスを継承
   createjs.extend(Slider, createjs.Container);
 
+  // 現在のページを取得
+  Slider.prototype.getCurrentPage = function() {
+    return this.pages[this.currentPage];
+  };
+
   // ページのセット
   Slider.prototype.setPages = function(list) {
     list = list || [];
@@ -111,8 +130,9 @@
     list.reverse();
 
     // listの数分pageを生成
-    list.forEach(function(item) {
-      var page = _this._createPage(item.result);
+    list.forEach(function(row) {
+      var page = _this._createPage(row.result);
+      page.url = row.item.url;
       _this.pages.unshift(page);
       _this.addChild(page);
     });
@@ -166,7 +186,7 @@
 
     // 重なりを調節
     _this.setChildIndex(_this.pages[prevPageIndex], _this.getNumChildren() - 1);
-    _this.setChildIndex(_this.pages[_this.currentPage], _this.getNumChildren() - 2);
+    _this.setChildIndex(_this.getCurrentPage(), _this.getNumChildren() - 2);
 
     // 前のページを開く
     _this.pages[prevPageIndex].open();
@@ -202,7 +222,7 @@
     _this.pages[nextPageIndex].nonAnimOpen();
 
     // 重なりを調節
-    _this.setChildIndex(_this.pages[_this.currentPage], _this.getNumChildren() - 1);
+    _this.setChildIndex(_this.getCurrentPage(), _this.getNumChildren() - 1);
     _this.setChildIndex(_this.pages[nextPageIndex], _this.getNumChildren() - 2);
 
     // カレントページを閉じる

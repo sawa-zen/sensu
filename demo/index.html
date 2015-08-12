@@ -14,7 +14,6 @@
   <body>
     <h1>Sensu</h1>
     <canvas id="demo1" width="950" height="335">Canvasが使えるブラウザで見てね</canvas>
-    <canvas id="demo2" width="950" height="335">Canvasが使えるブラウザで見てね</canvas>
     <!-- sensu-->
     <script defer src="../sensu.jquery.js"></script>
     <!-- demo-->
@@ -22,18 +21,9 @@
       $(window).load(function(){
         $('#demo1').sensu({
           list: [
-            './img/demo_1.png',
-            './img/demo_2.png',
-            './img/demo_3.png'
-          ]
-        });
-
-        $('#demo2').sensu({
-          autoplay: true,
-          list: [
-            './img/demo_1.png',
-            './img/demo_2.png',
-            './img/demo_3.png'
+            {src: './img/demo_1.png', url: 'http://sawa-zen.com'},
+            {src: './img/demo_2.png', url: 'http://topotal.com'},
+            {src: './img/demo_3.png'}
           ]
         });
       });
