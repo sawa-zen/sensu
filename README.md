@@ -15,7 +15,7 @@
   ```html
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
   <script src="https://code.createjs.com/createjs-2015.05.21.min.js"></script>
-  <script src="http://cdn.sawa-zen.com/sensu/0.1.0/sensu.jquery.min.js"></script>
+  <script src="./sensu.jquery.min.js"></script>
   ```
 
 1. canvasタグを用意
