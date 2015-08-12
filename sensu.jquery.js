@@ -364,8 +364,6 @@
       width * index, 0, width, img.height
     );
     this.isMoving = false;
-    this.cache(0, 0, this.width, this.height);
-    this.filters = [new createjs.ColorMatrixFilter(new createjs.ColorMatrix())];
   }
 
   // Bitmapクラスを継承
@@ -389,9 +387,6 @@
     this.y = this._calYposFromAngle(this.skewY);
     // x軸の動き
     this.x = this._calXposFromAngle(angle);
-    // フィルターの更新
-    this.filters[0].matrix.setColor(Math.sin(this.skewY * degToRad) * -25);
-    this.updateCache();
   };
 
   createjs.promote(Slice, 'Bitmap');
