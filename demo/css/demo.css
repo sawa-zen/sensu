@@ -5,7 +5,7 @@ body {
 }
 
 canvas {
-  width: 950px;
-  height: 335px;
+  width: 100%;
+  max-width: 950px;
   background-color: #CCC;
 }
