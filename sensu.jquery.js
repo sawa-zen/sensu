@@ -26,7 +26,7 @@
 
     // createjsのステージを用意
     _this._stage = new createjs.Stage(this.el.id);
-
+    _this._stage.enableMouseOver(10);
 
     // スライダーを生成
     var slider = new Slider({
@@ -84,7 +84,6 @@
     // 一つのファイル毎のcallback
     loadQueue.addEventListener('complete', function() {
       // スライダーにページセット
-      console.info(loadQueue.getItems());
       slider.setPages(loadQueue.getItems());
     });
     // 読み込み開始
@@ -418,33 +417,98 @@
     var _this = this;
 
     // 戻るボタン
-    var prevButton = new createjs.Shape();
-    prevButton.alpha = 0.5;
-    prevButton.graphics
-      .beginFill('#F00')
-      .drawRect(0, 0, 100, this.height);
+    var prevButton = new Button();
+    prevButton.regX = prevButton.width / 2;
+    prevButton.regY = prevButton.height / 2;
+    prevButton.x = prevButton.width / 2;
+    prevButton.y = _this.height / 2;
+    prevButton.rotation = 180;
     prevButton.on('click', function() {
       // 戻るボタンクリックを発火
       _this.dispatchEvent('prevclick');
     });
-    this.addChild(prevButton);
+    _this.addChild(prevButton);
 
     // 次へボタン
-    var nextButton = new createjs.Shape();
-    nextButton.regX = 100;
-    nextButton.alpha = 0.5;
-    nextButton.graphics
-      .beginFill('#00F')
-      .drawRect(this.width, 0, 100, this.height);
+    var nextButton = new Button();
+    nextButton.regX = nextButton.width / 2;
+    nextButton.regY = nextButton.height / 2;
+    nextButton.x = _this.width - (nextButton.width / 2);
+    nextButton.y = _this.height / 2;
     nextButton.on('click', function() {
       // 次へボタンクリックを発火
       _this.dispatchEvent('nextclick');
     });
-    this.addChild(nextButton);
+    _this.addChild(nextButton);
   };
 
   createjs.promote(Controller, 'Container');
 
+
+
+
+  // コントローラのボタンクラス
+  function Button() {
+    this.Container_constructor();
+    this.width = 100;
+    this.height = 100;
+    this.alpha = 0.2;
+    this.mouseChildren = false;
+    this.cursor = 'pointer';
+    this.initialize();
+  }
+
+  // Containerクラスを継承
+  createjs.extend(Button, createjs.Container);
+
+  // 初期描画
+  Button.prototype.initialize = function() {
+
+    // 円
+    var circle = new createjs.Shape();
+    circle.graphics.beginFill('#000');
+    circle.graphics.drawCircle(0, 0, 30);
+    circle.x = this.width / 2;
+    circle.y = this.height / 2;
+    this.addChild(circle);
+
+    // 矢印
+    var graphics = new createjs.Graphics();
+    graphics
+      .setStrokeStyle(4)
+      .beginStroke('#FFF')
+      .moveTo(0, 0)
+      .lineTo(15, 15)
+      .lineTo(0, 30)
+      .endStroke();
+    var arrow = new createjs.Shape(graphics);
+    arrow.regX = 15 / 2;
+    arrow.regY = 30 / 2;
+    arrow.x = this.width / 2;
+    arrow.y = this.height / 2;
+    this.addChild(arrow);
+
+    // マウスが乗ったらフォーカスアニメーション
+    this.on('mouseover', this.focus);
+
+    // マウスが乗ったらフォーカスアニメーション
+    this.on('mouseout', this.blur);
+
+  };
+
+  // フォーカス
+  Button.prototype.focus = function() {
+    createjs.Tween.get(this)
+      .to({alpha: 0.5, scaleX: 1.1, scaleY: 1.1}, 200, createjs.Ease.backOut);
+  };
+
+  // ブラー
+  Button.prototype.blur = function() {
+    createjs.Tween.get(this)
+      .to({alpha: 0.2, scaleX: 1, scaleY: 1}, 200, createjs.Ease.backOut);
+  };
+
+  createjs.promote(Button, 'Container');
 
 
 
