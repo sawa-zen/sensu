@@ -12,8 +12,28 @@ body {
 /**
  * header
  */
+header {
+  height: 150px;
+}
+header h1 {
+  margin: 0;
+  line-height: 150px;
+}
 header h1 img {
   width: 300px;
+}
+
+
+/**
+ * section共通設定
+ */
+.container section {
+  margin-bottom: 40px;
+}
+
+.container section h1 {
+  margin: 0 0 20px;
+  font-weight: lighter;
 }
 
 
@@ -60,7 +80,10 @@ header h1 img {
 }
 
 /* テストのための高さスタイル */
-.sensu-moderate-height { line-height: 100px; outline: 1px solid blue; }
+.sensu-moderate-height {
+  line-height: 100px;
+  outline: 1px solid blue;
+}
 
 
 /**
