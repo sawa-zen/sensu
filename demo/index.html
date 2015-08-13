@@ -10,11 +10,11 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.7/highlight.min.js"></script>
 
     <!-- bootstrap -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
 
     <!-- CSS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.min.css" rel="stylesheet">
+    <link href="//cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.min.css" rel="stylesheet">
     <link href="./css/demo.css" rel="stylesheet">
 
   </head>
@@ -24,6 +24,7 @@
     </header>
     <div class="container">
       <div class="row">
+
         <div class="col-md-4" role="complementary">
           <nav class="sensu-sidebar hidden-print"><!-- hidden-xs -->
             <section>
@@ -40,6 +41,7 @@
             </section>
           </nav>
         </div>
+
         <div id="main-content" class="col-md-8" role="main">
           <section id="description">
             <h1>Description</h1>
@@ -63,7 +65,7 @@
 });</code></pre>
           </section>
 
-          <section>
+          <section id="settings">
             <h1>Settings</h1>
             <table class="table table-striped">
               <thead>
@@ -71,23 +73,33 @@
                   <th>Option</th>
                   <th>Type</th>
                   <th>Default</th>
+                  <th>Description</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td>Mark</td>
-                  <td>Otto</td>
-                  <td>@mdo</td>
+                  <td>list</td>
+                  <td>array</td>
+                  <td>[]</td>
+                  <td>画像データの入ったリスト</td>
                 </tr>
                 <tr>
-                  <td>Jacob</td>
-                  <td>Thornton</td>
-                  <td>@fat</td>
+                  <td>roop</td>
+                  <td>boolean</td>
+                  <td>true</td>
+                  <td>ループさせるかどうか</td>
                 </tr>
                 <tr>
-                  <td>Larry</td>
-                  <td>the Bird</td>
-                  <td>@twitter</td>
+                  <td>autoplay</td>
+                  <td>boolean</td>
+                  <td>false</td>
+                  <td>自動ページングをさせるかどうか</td>
+                </tr>
+                <tr>
+                  <td>autoplaySpeed</td>
+                  <td>int</td>
+                  <td>5000</td>
+                  <td>自動ページングさせる時間</td>
                 </tr>
               </tbody>
             </table>

@@ -13,8 +13,8 @@
 1. 依存ファイルとsensu.jsを読み込む
 
   ```html
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-  <script src="https://code.createjs.com/createjs-2015.05.21.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+  <script src="//code.createjs.com/createjs-2015.05.21.min.js"></script>
   <script src="./sensu.jquery.min.js"></script>
   ```
 
@@ -46,7 +46,7 @@ Option | Type | Default | Description
 list | array | [] | 画像のリスト
 roop | boolean | true | ループさせるかどうか
 autoplay | boolean | false | 自動ページングさせるかどうか
-autoplaySpeed | int  | 3000 | 自動ページングさせる時間
+autoplaySpeed | int  | 5000 | 自動ページングさせる時間
 
 
 ## Author
