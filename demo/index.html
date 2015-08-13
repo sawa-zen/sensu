@@ -4,29 +4,159 @@
     <meta charset="utf-8">
     <title>sensu demo</title>
     <meta content="sensu demo" name="description">
-    <!-- CSS-->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.min.css" rel="stylesheet">
+
+    <!-- highlight -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.7/styles/default.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.7/highlight.min.js"></script>
+
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+
+    <!-- CSS -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.min.css" rel="stylesheet">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
     <link href="./css/demo.css" rel="stylesheet">
-    <!-- JS-->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-    <script src="https://code.createjs.com/createjs-2015.05.21.min.js"></script>
+
   </head>
   <body>
-    <h1>Sensu</h1>
-    <canvas id="demo1" width="950" height="335">Canvasが使えるブラウザで見てね</canvas>
-    <!-- sensu-->
-    <script defer src="../sensu.jquery.js"></script>
-    <!-- demo-->
-    <script type="text/javascript">
+    <header class="text-center">
+      <h1><img src="./img/title.png" alt="Sensu Slider" /></h1>
+    </header>
+    <div class="container">
+      <div class="row">
+
+        <!-- サイドバー -->
+        <div id="sidebar" class="col-md-4" role="complementary">
+
+          <section id="download">
+            <h1>Download</h1>
+            <a class="btn btn-primary" href="//sensu.sawa-zen.com/sensu.jquery.js">
+              Download sensu.jquery.js v0.1.0
+            </a>
+            <a class="btn btn-primary" href="//sensu.sawa-zen.com/sensu.jquery.min.js">
+              Download sensu.jquery.min.js v0.1.0
+            </a>
+          </section>
+
+          <section id="github">
+            <h1>Github</h1>
+            <a class="btn btn-default" href="//github.com/sawa-zen/sensu" target="_blank">
+              <i class="fa fa-github"></i> View On Github
+            </a>
+          </section>
+
+          <section id="author">
+            <h1>Author</h1>
+            <a href="//sawa-zen.com" target="_blank">@sawa-zen</a>
+          </section>
+
+        </div>
+
+
+        <!-- メイン -->
+        <div id="main-content" class="col-md-8" role="main">
+
+          <section id="demo">
+            <h1>Demo</h1>
+            <canvas id="demo1" width="950" height="335">Canvasが使えるブラウザで見てね</canvas>
+          </section>
+
+          <section id="getting-start">
+            <h1>Getting Start</h1>
+            <ol>
+              <li>
+                <p>依存ファイルとsensu.jsを読み込む</p>
+                <pre><code class="html">&lt;script src=&quot;//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;//code.createjs.com/createjs-2015.05.21.min.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;./sensu.jquery.min.js&quot;&gt;&lt;/script&gt;</code></pre>
+              </li>
+              <li>
+                <p>canvasタグを用意</p>
+                <pre><code class="html">&lt;canvas id=&quot;sensu&quot; /&gt;</code></pre>
+              </li>
+              <li>
+                <p>sensuメソッドを実行</p>
+                <pre><code class="javascript">$(window).load(function(){
+  $('#sensu').sensu({
+    list: [
+      {src: './img/demo_1.png', url: 'http://sawa-zen.com'},
+      {src: './img/demo_2.png', url: 'http://topotal.com'},
+      {src: './img/demo_3.png'}
+    ]
+  });
+});</code></pre>
+              </li>
+            </ol>
+          </section>
+
+          <section id="settings">
+            <h1>Settings</h1>
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Option</th>
+                  <th>Type</th>
+                  <th>Default</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>list</td>
+                  <td>array</td>
+                  <td>[]</td>
+                  <td>画像データの入ったリスト</td>
+                </tr>
+                <tr>
+                  <td>roop</td>
+                  <td>boolean</td>
+                  <td>true</td>
+                  <td>ループさせるかどうか</td>
+                </tr>
+                <tr>
+                  <td>autoplay</td>
+                  <td>boolean</td>
+                  <td>false</td>
+                  <td>自動ページングをさせるかどうか</td>
+                </tr>
+                <tr>
+                  <td>autoplaySpeed</td>
+                  <td>int</td>
+                  <td>5000</td>
+                  <td>自動ページングさせる時間</td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+
+        </div>
+
+
+      </div>
+    </div>
+
+    <!-- JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script src="https://code.createjs.com/createjs-2015.05.21.min.js"></script>
+    <script defer src="../sensu.jquery.min.js"></script>
+    <script>
+      // sensu
       $(window).load(function(){
         $('#demo1').sensu({
           list: [
             {src: './img/demo_1.png', url: 'http://sawa-zen.com'},
             {src: './img/demo_2.png', url: 'http://topotal.com'},
             {src: './img/demo_3.png'}
-          ]
+          ],
+          autoplay: true
         });
       });
+
+      // hightlight
+      hljs.initHighlightingOnLoad();
     </script>
+
   </body>
 </html>

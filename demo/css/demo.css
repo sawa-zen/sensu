@@ -1,11 +1,82 @@
-body {
-  background-color: #d35400;
-  padding: 20px;
-  color: #FFF;
+html, body {
+  padding: 0;
+  margin: 0;
 }
 
+body {
+  color: #6C2700;
+  background-image: url(../img/header_back.png);
+}
+
+a {
+  color: #6C2700;
+}
+
+/**
+ * header
+ */
+header {
+  height: 150px;
+}
+header h1 {
+  margin: 0;
+  line-height: 150px;
+}
+header h1 img {
+  width: 300px;
+}
+
+
+/**
+ * section共通設定
+ */
+.container section {
+  margin-bottom: 40px;
+}
+
+.container section h1 {
+  margin: 0 0 20px;
+  font-weight: lighter;
+}
+
+
+
+/**
+ * sidebar
+ */
+#sidebar
+#download
+a {
+  margin-bottom: 10px;
+}
+
+#sidebar
+#link
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+#sidebar
+#link
+ul li {
+  line-height: 30px;
+}
+
+/**
+ * main content
+ */
+#main-content
+#demo
 canvas {
+  margin: 0 auto;
   width: 100%;
   max-width: 950px;
-  background-color: #CCC;
+  box-shadow: 0 0 20px #CCC;
+}
+
+#main-content
+#getting-start
+ol {
+  padding: 0 0 0 20px;
 }

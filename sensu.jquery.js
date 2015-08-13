@@ -1,3 +1,15 @@
+/*
+
+Sensu Slider
+
+ Version: 0.1.0
+  Author: sawa-zen
+ Website: http://sawa-zen.com
+    Docs: http://sensu.sawa-zen.com/demo
+    Repo: https://github.com/sawa-zen/sensu
+  Issues: https://github.com/sawa-zen/sensu/issues
+
+ */
 (function ($) {
 
   var pluginName = 'sensu',
