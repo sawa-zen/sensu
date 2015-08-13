@@ -8,6 +8,9 @@ body {
   background-image: url(../img/header_back.png);
 }
 
+a {
+  color: #6C2700;
+}
 
 /**
  * header
@@ -41,61 +44,39 @@ header h1 img {
 /**
  * sidebar
  */
-.sensu-sidebar {
+#sidebar
+#download
+a {
+  margin-bottom: 10px;
 }
 
-.sensu-sidebar.affix {
-  position: fixed;
-  top: 20px;
+#sidebar
+#link
+ul {
+  list-style: none;
+  padding: 0;
 }
 
-.sensu-sidebar h1 img {
-  margin: 0 auto;
-  display: block;
-  width: 80%;
+#sidebar
+#link
+ul li {
+  line-height: 30px;
 }
-
-.sensu-sidebar .nav>.active:focus>a,
-.sensu-sidebar .nav>.active:hover>a,
-.sensu-sidebar .nav>.active>a {
-  font-weight: 700;
-}
-
-/* サブセクションのスタイル(scrollspy用) */
-.sensu-sidebar .nav .nav>li>a {
-  padding-top: 1px;
-  padding-bottom: 1px;
-  padding-left: 30px;
-}
-
-/* 非アクティブのサブセクションを隠す(scrollspy用) */
-.sensu-sidebar .nav .nav {
-  display: none;
-  padding-bottom: 10px
-}
-
-/* アクティブのサブセクションを表示(scrollspy用) */
-.sensu-sidebar .nav>.active>ul {
-  display: block
-}
-
-/* テストのための高さスタイル */
-.sensu-moderate-height {
-  line-height: 100px;
-  outline: 1px solid blue;
-}
-
 
 /**
  * main content
  */
-#main-content {
-}
-
 #main-content
+#demo
 canvas {
   margin: 0 auto;
   width: 100%;
   max-width: 950px;
   box-shadow: 0 0 20px #CCC;
+}
+
+#main-content
+#getting-start
+ol {
+  padding: 0 0 0 20px;
 }
