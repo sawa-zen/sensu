@@ -1,4 +1,6 @@
-# sensu
+# ![Sensu Slider](demo/img/thumbnail.png)
+
+
 蛇腹状に折りたたむようにスライドするjQueryプラグインスライダー
 
 [Demoページ](http://sensu.sawa-zen.com/demo)
