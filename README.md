@@ -47,6 +47,7 @@ Option | Type | Default | Description
 ------ | ---- | ------- | -----------
 list | array | [] | 画像のリスト
 roop | boolean | true | ループさせるかどうか
+sliceNum | int | 10 | いくつにスライスするか
 autoplay | boolean | false | 自動ページングさせるかどうか
 autoplaySpeed | int  | 5000 | 自動ページングさせる時間
 

@@ -16,6 +16,7 @@ Sensu Slider
       degToRad = Math.PI / 180,
       defaults = {
         roop: true,
+        sliceNum: 10,
         autoplay: false,
         autoplaySpeed: 5000
       };
@@ -42,7 +43,8 @@ Sensu Slider
 
     // スライダーを生成
     var slider = new Slider({
-      roop: _this.settings.roop
+      roop: _this.settings.roop,
+      sliceNum: _this.settings.sliceNum
     });
     slider.width = this.el.width;
     slider.height = this.el.height;
@@ -142,7 +144,10 @@ Sensu Slider
 
     // listの数分pageを生成
     list.forEach(function(row) {
-      var page = _this._createPage(row.result);
+      var page = _this._createPage({
+        img: row.result,
+        sliceNum: _this.sliceNum
+      });
       page.url = row.item.url;
       _this.pages.unshift(page);
       _this.addChild(page);
@@ -150,9 +155,9 @@ Sensu Slider
   };
 
   // ページの生成
-  Slider.prototype._createPage = function(img) {
+  Slider.prototype._createPage = function(params) {
     var _this = this;
-    var page = new Page(img);
+    var page = new Page(params);
 
     // ページのアニメーション開始を監視
     page.on('beforeanimate', function() {
@@ -251,18 +256,19 @@ Sensu Slider
   /**
    * ページクラス
    */
-  function Page(img) {
+  function Page(params) {
+    params = params || {};
     var _this = this;
 
     _this.Container_constructor();
 
     // 初期化
-    _this.img = img;
-    _this.width = img.width;
-    _this.height = img.height;
+    _this.img = params.img;
+    _this.width = params.img.width;
+    _this.height = params.img.height;
     _this.angle = 0;
-    _this.sliceCount = 10;
-    _this.sliceWidth = _this.width / _this.sliceCount;
+    _this.sliceNum = params.sliceNum;
+    _this.sliceWidth = _this.width / _this.sliceNum;
 
     // スライスをセット
     _this._setSlices();
@@ -281,7 +287,7 @@ Sensu Slider
   Page.prototype._setSlices = function() {
     var _this = this;
     // スライス数分画像を分割して生成
-    for (var index = 0; index < _this.sliceCount; index++) {
+    for (var index = 0; index < _this.sliceNum; index++) {
       var slice = new Slice(_this.img, _this.sliceWidth, index);
       _this.addChild(slice);
     }
