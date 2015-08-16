@@ -142,8 +142,6 @@ Sensu Slider
     // 重ね順の関係でlistを逆順に
     list.reverse();
 
-    console.info(_this.sliceNum);
-
     // listの数分pageを生成
     list.forEach(function(row) {
       var page = _this._createPage({
@@ -259,9 +257,7 @@ Sensu Slider
    * ページクラス
    */
   function Page(params) {
-    console.info(params);
     params = params || {};
-
     var _this = this;
 
     _this.Container_constructor();
