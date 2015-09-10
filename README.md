@@ -33,7 +33,7 @@
     $(window).onload(function() {
       $('#my-canvas').sensu({
         list: [
-          {src: './img/demo1.png', url: 'http://sawa-zen.com},
+          {src: './img/demo1.png', url: 'http://sawa-zen.com'},
           {src: './img/demo2.png'},
           {src: './img/demo3.png'}
         ]
